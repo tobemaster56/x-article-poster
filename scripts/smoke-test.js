@@ -188,6 +188,8 @@ vm.runInNewContext(
      "Copy MD": "复制 MD",
      "Download MD": "下载 MD",
      "Export Markdown": "导出 Markdown",
+     "Article title Markdown tools": "文章标题区 Markdown 工具",
+     "MD": "MD",
      "Queue Markdown drafts": "加入 Markdown 草稿队列",
      "Release to add them to the xPoster side panel.": "松开后加入 xPoster 侧边栏。"
    }));
@@ -480,9 +482,14 @@ assert.ok(
     'navigator.clipboard.writeText(text)',
     'link.download = fileName || articleFileName("")',
     'root.setAttribute("role", "group")',
-    'root.setAttribute("aria-label", translateContentText("Export Markdown"))',
+    'root = document.createElement("span")',
+    'root.setAttribute("aria-label", translateContentText("Article title Markdown tools"))',
+    '__xposter_article_export_mark',
+    '${translateContentText("MD")}',
     'data-export-action="copy"',
     'data-export-action="download"',
+    'data-export-icon="copy"',
+    'data-export-icon="download"',
     '__xposter_article_export_feedback',
     'root.addEventListener("click", handleArticleExportActionClick)',
     'await handleArticleExportAction(button.dataset.exportAction)',
@@ -494,19 +501,26 @@ assert.ok(
     'root.dataset.articleCharacterCount = String(article.characterCount || 0)',
     'root.dataset.articleImageCount = String(article.imageCount || 0)',
     'placeArticleExportRoot(root, article)',
-    'if (anchor.nextSibling !== root) anchor.parentElement.insertBefore(root, anchor.nextSibling)',
-    'anchor.parentElement.insertBefore(root, anchor.nextSibling)',
+    'if (root.parentElement !== anchor) anchor.appendChild(root)',
     'root.dataset.placement = "inline"',
     'root.dataset.placement = "fixed"',
+    'function articleNodeReadableText',
+    'const heading = normalizeText(articleNodeReadableText(titleNode))',
+    'clone?.querySelector?.(`#${ARTICLE_EXPORT_ID}`)?.remove()',
     '个字符，${images} 张图片',
     '${characters} characters, ${images} images',
     'position: fixed',
     'right: var(--__xposter-article-export-inline-end, 24px)',
     'function articleDockInlineEnd',
     'width: fit-content',
-    'button[data-active="true"]',
+    'button.innerHTML = articleExportIconMarkup(buttonMode)',
+    'button.removeAttribute("data-active")',
+    'function articleExportIconMarkup',
+    '.__xposter_article_export_actions',
+    'opacity: 0',
+    'data-placement="fixed"] .__xposter_article_export_actions',
     '--__xposter-export-paper: #ffffff',
-    'border: 1px solid var(--__xposter-export-line)',
+    'border-radius: 999px',
     'background: var(--__xposter-export-paper)',
     'const LANGUAGE_STORAGE_KEY = "xposter_language"',
     'function restoreContentLanguage',
@@ -523,9 +537,11 @@ assert.ok(
       'toggleArticleExportMenu',
       'closeArticleExportMenuOnOutside',
       'backdrop-filter: blur',
+      'button[data-active="true"]',
+      'button.textContent = articleExportShortLabel',
       '[data-xposter-article-export-host="true"]'
     ]),
-  "readable X article pages should expose localized title-adjacent Markdown copy/download labels with remembered mode, title de-duplication, and file/count feedback"
+  "readable X article pages should expose localized title-integrated Markdown copy/download tools with remembered action, title de-duplication, and file/count feedback"
 );
 assert.ok(
   !contentScriptText.includes("function positionDropHint") &&
@@ -557,6 +573,7 @@ assert.equal(
 );
 assert.equal(statusSandbox.statusHelpers.translateContentText("Preparing Markdown..."), "正在准备 Markdown...", "X page status details should follow the selected language");
 assert.equal(statusSandbox.statusHelpers.translateContentText("Writing article"), "正在写入文章", "X page status titles should be localized");
+assert.equal(statusSandbox.statusHelpers.translateContentText("Article title Markdown tools"), "文章标题区 Markdown 工具", "X article export group should describe its title placement");
 assert.equal(statusSandbox.statusHelpers.articleExportLabel("copy"), "复制 Markdown", "X article export controls should localize action labels");
 assert.equal(statusSandbox.statusHelpers.articleExportShortLabel("download"), "下载 MD", "X article export title labels should use compact localized text");
 statusSandbox.state.language = "zh-TW";
@@ -768,14 +785,15 @@ assert.ok(
 assert.ok(
   sidepanelHtml.includes('id="articleExportOptions"') &&
     sidepanelHtml.includes('id="articleExportOption" checked') &&
-    sidepanelHtml.includes("Show Markdown export button") &&
+    sidepanelHtml.includes("Title Markdown tools") &&
+    sidepanelHtml.includes("Copy or download the article without adding a separate button row.") &&
     sidepanelRuntimeText.includes('const STORAGE_ARTICLE_EXPORT_SETTINGS = "xposter_article_export_settings"') &&
     sidepanelText.includes("let articleExportOptions = { enabled: true, mode: \"copy\" }") &&
     sidepanelText.includes("function restoreArticleExportOptions") &&
     sidepanelText.includes("function restoreStartupState") &&
     sidepanelText.includes("setArticleExportOptions({") &&
     sidepanelText.includes("applyArticleExportOptions(stored[STORAGE_ARTICLE_EXPORT_SETTINGS] || articleExportOptions)"),
-  "settings should expose a default-on article Markdown export toggle"
+  "settings should expose default-on title-integrated article Markdown tools"
 );
 assert.ok(
   !sidepanelText.includes('record-icon-action is-disabled'),
@@ -942,8 +960,8 @@ assert.ok(
     !sidepanelHtml.includes('data-editor-mode="read"') &&
     !sidepanelHtml.includes('data-editor-mode="check"') &&
     !sidepanelCss.includes(".draft-brief") &&
-    sidepanelCss.includes(".draft-editor-status"),
-  "draft editor status should stay compact, host a single Write/Read toggle, and avoid duplicate recognized-summary or Check rows"
+    !sidepanelCss.includes(".draft-editor-status"),
+  "draft editor should keep one toolbar Write/Read toggle and avoid duplicate recognized-summary, status, or Check rows"
 );
 assert.ok(
   contentScriptText.includes("message.options || {}"),
@@ -995,8 +1013,8 @@ assert.ok(
     "src/sidepanel-messages.js",
     "src/sidepanel-patterns.js",
     'id="draftEditorToolbar"',
-    'id="draftEditorStatus"',
     'id="draftEditorModeToggle"',
+    'class="draft-editor-toolbar-meta"',
     "data-editor-mode-toggle",
     'class="editor-command-icon"',
     'id="draftInlinePreview"',
@@ -1010,13 +1028,16 @@ assert.ok(
       ">Table</button>",
       "vendor/codemirror-editor.bundle.js",
       'id="draftEditorModeLabel"',
+      'id="draftEditorStatus"',
+      'id="draftEditorStats"',
       'data-editor-mode="edit"',
       'data-editor-mode="read"',
       'data-editor-mode="check"',
       'id="draftBrief"'
     ]) &&
     includesAll(sidepanelRuntimeText, [
-      'DRAFT_EDITOR_MODES: new Set(["edit", "read"])',
+      'DRAFT_EDITOR_MODES:',
+      'new Set(["edit", "read"])',
       "function draftText()",
       "function miniGfm()",
       "function protectReadPreviewCodeBlocks",
@@ -1029,10 +1050,6 @@ assert.ok(
       "function updateEditorModeToggle",
       "button.disabled = !isEdit || queueModeActive()",
       "function setDraftText(markdown",
-      "parseStatus = true",
-      "updateDraftEditorStatus({ parse = true } = {})",
-      "updateDraftEditorStatus({ parse: parseStatus });",
-      "updateDraftEditorStatus({ parse: false });",
       "else if (draftText().trim()) scheduleAnalyzeDraft(STARTUP_DRAFT_ANALYZE_DELAY_MS);",
       "function handleDraftEditorInput",
       "function setDraftEditorMode",
@@ -1046,8 +1063,6 @@ assert.ok(
       "function highlightInlineMarkdownSyntax",
       "function syncDraftSyntaxScroll",
       'els.markdown.addEventListener("scroll", syncDraftSyntaxScroll)',
-      "const counts = parse ? markdownSegmentCounts(text, latestCounts || shared.segmentCounts([])) : shared.segmentCounts([]);",
-      "editorStatsText(text, counts)",
       "editorStatsText(text, markdownSegmentCounts(text))",
       "function translateVisibleWorkspace()",
       "translateVisibleWorkspace();",
@@ -1059,7 +1074,7 @@ assert.ok(
       'els.draftEditorShell.dataset.density = isCompact ? "compact" : "roomy";',
       "function runWhenIdle(callback, timeout = STARTUP_IDLE_TIMEOUT_MS)",
       "function restoreSingleDraftMarkdown(markdown, { analyze = true } = {})",
-      "setDraftText(text, { preview: false, parseStatus: false, syntax: \"defer\" });",
+      "setDraftText(text, { preview: false, syntax: \"defer\" });",
       "function scheduleDraftSyntaxHighlight",
       "function paintStartupShell",
       "function restoreStartupState",
@@ -1130,16 +1145,15 @@ assert.ok(
       ".draft-token-code",
       '.draft-inline-preview[data-preview-mode="read"]',
       ".draft-inline-preview",
-      ".draft-editor-status",
-      ".draft-editor-status > span",
       "--draft-content-font:",
       '"PingFang SC"',
       "font-family: var(--draft-content-font);",
       ".draft-editor-mode-toggle",
-      ".draft-editor-toolbar button .editor-command-icon",
+      ".draft-editor-formatting button .editor-command-icon",
+      ".draft-editor-toolbar .draft-editor-mode-toggle [data-mode-label]",
       "stroke-linecap: round;",
       "@media (max-width: 520px)",
-      ".draft-editor-formatting {\n    overflow-x: visible;\n    flex-wrap: wrap;"
+      ".draft-editor-formatting {\n    overflow-x: auto;\n    flex-wrap: nowrap;"
     ]) &&
     excludesAll(sidepanelCss, [
       "box-shadow: 0 -16px 30px rgba(15, 20, 25, 0.10);",
@@ -1160,7 +1174,7 @@ assert.ok(
     excludesAll(sidepanelCss, [
       "font-family: ui-serif, Georgia, \"Times New Roman\", serif;"
     ]),
-  "side panel should use a lightweight native textarea editor with MiniGFM read preview, one status-bar mode toggle, responsive controls, and adapter-based draft reads"
+  "side panel should use a lightweight native textarea editor with MiniGFM read preview, one toolbar mode toggle, responsive controls, and adapter-based draft reads"
 );
 assert.ok(
   sidepanelText.includes("const isCompact = !value.trim() || (value.length < 420 && meaningfulLines <= 8 && !hasRichBlocks);") &&

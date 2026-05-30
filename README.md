@@ -15,7 +15,7 @@ xPoster is a free, open source Chrome extension for writers who draft in Markdow
 - Runs a preflight check before writing so you know whether the draft, active X Article tab, editor bridge, and images are ready.
 - Supports single drafts and queued multi-file imports from local `.md` files.
 - Keeps recoverable records so previous Markdown can be searched, copied, edited, and written again.
-- Adds an optional, quiet Markdown export button on readable X Article pages.
+- Adds optional Markdown copy/download tools beside readable X Article titles.
 - Stays local: no account, subscription, backend service, analytics, license server, or payment gate.
 
 ## Install

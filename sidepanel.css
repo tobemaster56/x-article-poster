@@ -1153,14 +1153,13 @@ h2 {
 
 .draft-editor-shell {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
   grid-row: 3;
   position: relative;
   height: 100%;
   min-height: 0;
   max-height: 100%;
-  border-top: 1px solid color-mix(in oklch, var(--line), var(--ink) 5%);
-  border-bottom: 1px solid color-mix(in oklch, var(--line), var(--ink) 8%);
+  border: 1px solid color-mix(in oklch, var(--line), var(--ink) 4%);
   background: var(--paper);
   overflow: hidden;
   contain: layout;
@@ -1175,7 +1174,7 @@ h2 {
 }
 
 .draft-editor-shell:hover {
-  border-bottom-color: color-mix(in oklch, var(--line), var(--ink) 28%);
+  border-color: color-mix(in oklch, var(--line), var(--ink) 20%);
   background: color-mix(in oklch, var(--paper), var(--paper-2) 18%);
 }
 
@@ -1186,23 +1185,26 @@ h2 {
 .draft-editor-toolbar,
 .record-edit-toolbar {
   grid-row: 1;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   min-width: 0;
-  padding: 5px 7px;
-  border-bottom: 1px solid color-mix(in oklch, var(--line), transparent 25%);
-  background: color-mix(in oklch, var(--paper-2), var(--paper) 42%);
+  min-height: 36px;
+  padding: 4px 6px 4px 8px;
+  border-bottom: 1px solid color-mix(in oklch, var(--line), transparent 40%);
+  background: color-mix(in oklch, var(--paper-2), var(--paper) 68%);
 }
 
-.draft-editor-shell:not([data-mode="edit"]) .draft-editor-toolbar {
-  display: none;
+.draft-editor-shell:not([data-mode="edit"]) .draft-editor-formatting {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .draft-editor-formatting {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
   max-width: 100%;
   overflow-x: auto;
@@ -1213,16 +1215,16 @@ h2 {
   display: none;
 }
 
-.draft-editor-toolbar button,
+.draft-editor-formatting button,
 .record-edit-toolbar button {
   flex: 0 0 auto;
-  min-width: 30px;
-  height: 28px;
+  min-width: 28px;
+  height: 27px;
   display: inline-grid;
   place-items: center;
   padding: 0 8px;
-  border: 1px solid color-mix(in oklch, var(--line), transparent 6%);
-  background: color-mix(in oklch, var(--paper), var(--paper-2) 22%);
+  border: 1px solid transparent;
+  background: transparent;
   color: var(--ink);
   cursor: pointer;
   font-size: 11px;
@@ -1235,31 +1237,36 @@ h2 {
     transform var(--motion-quick) var(--ease-out-quart);
 }
 
-.draft-editor-toolbar button:hover,
+.record-edit-toolbar button {
+  border-color: color-mix(in oklch, var(--line), transparent 6%);
+  background: color-mix(in oklch, var(--paper), var(--paper-2) 22%);
+}
+
+.draft-editor-formatting button:hover,
 .record-edit-toolbar button:hover {
-  border-color: color-mix(in oklch, var(--signal), var(--line) 42%);
-  background: color-mix(in oklch, var(--paper), var(--signal) 5%);
+  border-color: color-mix(in oklch, var(--signal), transparent 60%);
+  background: color-mix(in oklch, var(--signal), var(--paper) 92%);
   color: var(--signal-text);
 }
 
-.draft-editor-toolbar button:active,
+.draft-editor-formatting button:active,
 .record-edit-toolbar button:active {
   transform: translateY(1px);
 }
 
-.draft-editor-toolbar button[aria-pressed="true"],
+.draft-editor-formatting button[aria-pressed="true"],
 .record-edit-toolbar button[aria-pressed="true"] {
   border-color: var(--ink);
   background: var(--ink);
   color: var(--button-ink);
 }
 
-.draft-editor-toolbar button[data-editor-command="italic"] span,
+.draft-editor-formatting button[data-editor-command="italic"] span,
 .record-edit-toolbar button[data-editor-command="italic"] span {
   font-style: italic;
 }
 
-.draft-editor-toolbar button .editor-command-icon,
+.draft-editor-formatting button .editor-command-icon,
 .record-edit-toolbar .editor-command-icon {
   width: 15px;
   height: 15px;
@@ -1270,6 +1277,13 @@ h2 {
   stroke-linejoin: round;
 }
 
+.draft-editor-toolbar-meta {
+  min-width: 27px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
 @media (max-width: 520px) {
   :root {
     --draft-editor-roomy-block-size: clamp(220px, calc(100dvh - 276px), 390px);
@@ -1278,12 +1292,12 @@ h2 {
 
   .draft-editor-toolbar,
   .record-edit-toolbar {
-    align-items: stretch;
+    align-items: center;
   }
 
   .draft-editor-formatting {
-    overflow-x: visible;
-    flex-wrap: wrap;
+    overflow-x: auto;
+    flex-wrap: nowrap;
   }
 }
 
@@ -1598,41 +1612,19 @@ h2 {
   white-space: pre-wrap;
 }
 
-.draft-editor-status {
-  grid-row: 3;
-  min-height: 30px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 6px 4px 8px;
-  border-top: 1px solid color-mix(in oklch, var(--line), transparent 25%);
-  background: color-mix(in oklch, var(--paper-2), var(--paper) 44%);
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 720;
-}
-
-.draft-editor-status > span {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .draft-editor-mode-toggle {
   min-width: 58px;
-  height: 24px;
+  height: 27px;
   display: inline-grid;
   grid-auto-flow: column;
   grid-auto-columns: max-content;
   place-items: center;
   align-items: center;
-  gap: 5px;
-  padding: 0 8px 0 7px;
-  border: 1px solid color-mix(in oklch, var(--signal), var(--line) 52%);
-  background: color-mix(in oklch, var(--signal), var(--paper) 92%);
-  color: color-mix(in oklch, var(--signal-text), var(--ink) 12%);
+  gap: 4px;
+  padding: 0 7px;
+  border: 1px solid color-mix(in oklch, var(--line), transparent 8%);
+  background: color-mix(in oklch, var(--paper), var(--paper-2) 18%);
+  color: color-mix(in oklch, var(--muted), var(--ink) 12%);
   cursor: pointer;
   font-size: 10.5px;
   font-weight: 820;
@@ -1645,9 +1637,22 @@ h2 {
     transform var(--motion-quick) var(--ease-out-quart);
 }
 
+.draft-editor-toolbar .draft-editor-mode-toggle {
+  min-width: 27px;
+  width: 27px;
+  height: 27px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+}
+
+.draft-editor-toolbar .draft-editor-mode-toggle [data-mode-label] {
+  display: none;
+}
+
 .draft-editor-mode-toggle:hover {
   border-color: color-mix(in oklch, var(--signal), var(--line) 24%);
-  background: color-mix(in oklch, var(--signal), var(--paper) 86%);
+  background: color-mix(in oklch, var(--signal), var(--paper) 91%);
   color: var(--signal-text);
 }
 
@@ -1656,8 +1661,8 @@ h2 {
 }
 
 .draft-editor-mode-toggle svg {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   fill: currentColor;
 }
 
@@ -1680,19 +1685,27 @@ h2 {
   display: inline;
 }
 
+.draft-editor-toolbar .draft-editor-mode-toggle[aria-pressed="true"] [data-mode-label="write"],
+.draft-editor-shell[data-mode="read"] .draft-editor-toolbar .draft-editor-mode-toggle [data-mode-label="write"] {
+  display: none;
+}
+
 :root[data-theme="dark"] .draft-editor-shell {
   background: var(--paper);
 }
 
 :root[data-theme="dark"] .draft-editor-toolbar,
-:root[data-theme="dark"] .record-edit-toolbar,
-:root[data-theme="dark"] .draft-editor-status {
+:root[data-theme="dark"] .record-edit-toolbar {
   background: color-mix(in oklch, var(--paper-2), var(--paper) 38%);
 }
 
-:root[data-theme="dark"] .draft-editor-toolbar button,
+:root[data-theme="dark"] .draft-editor-formatting button,
 :root[data-theme="dark"] .record-edit-toolbar button {
   background: color-mix(in oklch, var(--paper), var(--paper-2) 28%);
+}
+
+:root[data-theme="dark"] .draft-editor-formatting button {
+  background: transparent;
 }
 
 :root[data-theme="dark"] .draft-editor-mode-toggle {
@@ -5376,7 +5389,7 @@ textarea:focus-visible,
     min-height: 38px;
   }
 
-  .draft-editor-toolbar button,
+  .draft-editor-formatting button,
   .record-edit-toolbar button {
     min-height: 36px;
   }
