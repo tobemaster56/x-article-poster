@@ -601,6 +601,31 @@
       });
     }
 
+    // LaTeX 公式:块级 $$...$$ 优先,再行内 $...$(首尾非空格,避免误判 $5 这类货币)。
+    // 代码块 / 已识别 span 内的 $ 由 overlaps 跳过。公式文本保留原样(不经内联处理)。
+    const blockLatex = /\$\$([\s\S]+?)\$\$/g;
+    while ((match = blockLatex.exec(markdown)) !== null) {
+      if (overlaps(spans, match.index)) continue;
+      const formula = match[1].trim();
+      if (!formula) continue;
+      spans.push({
+        start: match.index,
+        end: match.index + match[0].length,
+        segment: { type: "latex", formula, display: true }
+      });
+    }
+    const inlineLatex = /\$(?!\s)((?:\\.|[^$\n\\])+?)(?<!\s)\$/g;
+    while ((match = inlineLatex.exec(markdown)) !== null) {
+      if (overlaps(spans, match.index)) continue;
+      const formula = match[1].trim();
+      if (!formula) continue;
+      spans.push({
+        start: match.index,
+        end: match.index + match[0].length,
+        segment: { type: "latex", formula }
+      });
+    }
+
     return spans.sort((left, right) => left.start - right.start);
   }
 
@@ -952,7 +977,7 @@
         counts[segment.type] = (counts[segment.type] || 0) + 1;
         return counts;
       },
-      { text: 0, image: 0, table: 0, tweet: 0, code: 0, divider: 0 }
+      { text: 0, image: 0, table: 0, tweet: 0, code: 0, divider: 0, latex: 0 }
     );
   }
 
@@ -1143,6 +1168,18 @@
             data: { url, tweetId: segment.tweetId },
             mutability: "IMMUTABLE"
           }
+        });
+        continue;
+      }
+
+      if (segment.type === "latex") {
+        const id = marker("LATEX");
+        html.push(`<p>${id}</p>`);
+        addBlock("unstyled", id);
+        // LATEX 与其他 atomic 不同:公式文本放在 block.text(经 op.text 传入),entity.data 为空。
+        plan.push({
+          marker: id,
+          op: { type: "atomic", entityType: "LATEX", data: {}, mutability: "IMMUTABLE", text: segment.formula }
         });
         continue;
       }

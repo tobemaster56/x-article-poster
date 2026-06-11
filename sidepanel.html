@@ -13,6 +13,7 @@
     <script src="src/sidepanel-messages.js" defer></script>
     <script src="src/sidepanel-patterns.js" defer></script>
     <script src="vendor/minigfm.min.js" defer></script>
+    <script src="vendor/katex.min.js" defer></script>
     <script src="sidepanel.js" defer></script>
   </head>
   <body>
@@ -63,11 +64,13 @@
             <div class="draft-editor-formatting" role="group" aria-label="Markdown formatting" data-i18n-aria-label="Markdown formatting">
               <button type="button" data-editor-command="bold" title="Bold" aria-label="Bold" data-i18n-title="Bold" data-i18n-aria-label="Bold">B</button>
               <button type="button" data-editor-command="italic" title="Italic" aria-label="Italic" data-i18n-title="Italic" data-i18n-aria-label="Italic"><span>I</span></button>
+              <button type="button" data-editor-command="strikethrough" title="Strikethrough" aria-label="Strikethrough" data-i18n-title="Strikethrough" data-i18n-aria-label="Strikethrough"><svg class="editor-command-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M16 8c0-2-1.8-3-4-3s-4 1-4 2.6c0 1 .6 1.7 1.8 2.2"/><path d="M8 16c0 1.8 1.8 3 4 3s4-1 4-2.8"/></svg></button>
               <button type="button" data-editor-command="heading" title="Heading" aria-label="Heading" data-i18n-title="Heading" data-i18n-aria-label="Heading">#</button>
               <button type="button" data-editor-command="code" title="Code" aria-label="Code" data-i18n-title="Code" data-i18n-aria-label="Code">`</button>
               <button type="button" data-editor-command="link" title="Link" aria-label="Link" data-i18n-title="Link" data-i18n-aria-label="Link"><svg class="editor-command-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1L11 5"/><path d="M14 11a5 5 0 0 0-7.1 0l-2 2a5 5 0 0 0 7.1 7.1l1.1-1.1"/></svg></button>
               <button type="button" data-editor-command="image" title="Image" aria-label="Image" data-i18n-title="Image" data-i18n-aria-label="Image"><svg class="editor-command-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="m8 15 3-3 2 2 3-4 4 5"/><path d="M8.5 9h.01"/></svg></button>
               <button type="button" data-editor-command="table" title="Table" aria-label="Table" data-i18n-title="Table" data-i18n-aria-label="Table"><svg class="editor-command-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="1"/><path d="M4 10h16"/><path d="M4 15h16"/><path d="M10 5v14"/><path d="M16 5v14"/></svg></button>
+              <button type="button" data-editor-command="latex-block" title="LaTeX block" aria-label="LaTeX block" data-i18n-title="LaTeX block" data-i18n-aria-label="LaTeX block"><svg class="editor-command-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13l3 6 3.5-13H21"/></svg></button>
             </div>
           </div>
           <div class="draft-editor-input-wrap">
@@ -844,22 +847,6 @@
             </fieldset>
           </div>
         </div>
-        <div class="setting-row setting-row-stack">
-          <div>
-            <strong data-i18n="Project and author">Project and author</strong>
-            <span data-i18n="Open the project page or follow updates from the author.">Open the project page or follow updates from the author.</span>
-          </div>
-          <div class="setting-links" aria-label="Project and author" data-i18n-aria-label="Project and author">
-            <a class="setting-link" href="https://github.com/nevertoday/xposter" target="_blank" rel="noopener noreferrer" title="Open GitHub project" aria-label="Open GitHub project" data-i18n-title="Open GitHub project" data-i18n-aria-label="Open GitHub project">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.5-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 0 1.6 1.1 1.6 1.1.9 1.5 2.4 1.1 2.9.8.1-.7.4-1.1.7-1.3-2.2-.3-4.6-1.1-4.6-5A3.9 3.9 0 0 1 6.8 8.9c-.1-.3-.5-1.3.1-2.7 0 0 .9-.3 2.8 1a9.7 9.7 0 0 1 5.1 0c1.9-1.3 2.8-1 2.8-1 .6 1.4.2 2.4.1 2.7a3.9 3.9 0 0 1 1.1 2.7c0 3.9-2.4 4.7-4.6 5 .4.3.7 1 .7 2v2.4c0 .3.2.6.7.5A10 10 0 0 0 12 2Z"/></svg>
-              <span data-i18n="GitHub project">GitHub project</span>
-            </a>
-            <a class="setting-link" href="https://x.com/xiaoxiaodong01" target="_blank" rel="noopener noreferrer" title="Follow author on X" aria-label="Follow author on X" data-i18n-title="Follow author on X" data-i18n-aria-label="Follow author on X">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.4 10.5 21.7 2h-1.8l-6.3 7.4L8.5 2H2.7l7.7 11.2L2.7 22h1.8l6.7-7.8 5.3 7.8h5.8l-7.9-11.5Zm-2.4 2.8-.8-1.1L5 3.4h2.6l5 7.1.8 1.1 6.5 9.1h-2.6L12 13.3Z"/></svg>
-              <span data-i18n="Follow author on X">Follow author on X</span>
-            </a>
-          </div>
-        </div>
       </section>
 
     </main>
@@ -879,11 +866,13 @@
           <div class="draft-editor-formatting" role="group" aria-label="Markdown formatting" data-i18n-aria-label="Markdown formatting">
             <button type="button" data-record-action="editor-command" data-editor-command="bold" title="Bold" aria-label="Bold" data-i18n-title="Bold" data-i18n-aria-label="Bold">B</button>
             <button type="button" data-record-action="editor-command" data-editor-command="italic" title="Italic" aria-label="Italic" data-i18n-title="Italic" data-i18n-aria-label="Italic"><span>I</span></button>
+            <button type="button" data-record-action="editor-command" data-editor-command="strikethrough" title="Strikethrough" aria-label="Strikethrough" data-i18n-title="Strikethrough" data-i18n-aria-label="Strikethrough"><svg class="editor-command-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M16 8c0-2-1.8-3-4-3s-4 1-4 2.6c0 1 .6 1.7 1.8 2.2"/><path d="M8 16c0 1.8 1.8 3 4 3s4-1 4-2.8"/></svg></button>
             <button type="button" data-record-action="editor-command" data-editor-command="heading" title="Heading" aria-label="Heading" data-i18n-title="Heading" data-i18n-aria-label="Heading">#</button>
             <button type="button" data-record-action="editor-command" data-editor-command="code" title="Code" aria-label="Code" data-i18n-title="Code" data-i18n-aria-label="Code">`</button>
             <button type="button" data-record-action="editor-command" data-editor-command="link" title="Link" aria-label="Link" data-i18n-title="Link" data-i18n-aria-label="Link"><svg class="editor-command-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1L11 5"/><path d="M14 11a5 5 0 0 0-7.1 0l-2 2a5 5 0 0 0 7.1 7.1l1.1-1.1"/></svg></button>
             <button type="button" data-record-action="editor-command" data-editor-command="image" title="Image" aria-label="Image" data-i18n-title="Image" data-i18n-aria-label="Image"><svg class="editor-command-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="m8 15 3-3 2 2 3-4 4 5"/><path d="M8.5 9h.01"/></svg></button>
             <button type="button" data-record-action="editor-command" data-editor-command="table" title="Table" aria-label="Table" data-i18n-title="Table" data-i18n-aria-label="Table"><svg class="editor-command-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="1"/><path d="M4 10h16"/><path d="M4 15h16"/><path d="M10 5v14"/><path d="M16 5v14"/></svg></button>
+            <button type="button" data-record-action="editor-command" data-editor-command="latex-block" title="LaTeX block" aria-label="LaTeX block" data-i18n-title="LaTeX block" data-i18n-aria-label="LaTeX block"><svg class="editor-command-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13l3 6 3.5-13H21"/></svg></button>
           </div>
         </div>
         <div class="record-edit-body" id="recordEditBody" data-mode="edit">

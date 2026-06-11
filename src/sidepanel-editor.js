@@ -174,11 +174,20 @@
     function applyTextareaCommand(command, options = {}) {
       if (command === "bold") surroundTextareaSelection("**", "**", options);
       else if (command === "italic") surroundTextareaSelection("_", "_", options);
+      else if (command === "strikethrough") surroundTextareaSelection("~~", "~~", options);
       else if (command === "heading") insertAtCurrentLine("## ", options);
       else if (command === "code") surroundTextareaSelection("`", "`", options);
       else if (command === "link") replaceTextareaSelection("[link text](https://)", 1, 10, options);
       else if (command === "image") replaceTextareaSelection("![alt text](https://)", 2, 10, options);
       else if (command === "table") replaceTextareaSelection("| Column | Value |\n| --- | --- |\n|  |  |\n", 34, 34, options);
+      else if (command === "latex-block") {
+        // 有选中:包成 $$ 块;无选中:插入示例公式并选中它(像插入链接那样给提示文本)。
+        if (textareaSelection(options.textarea || defaultTextarea()).selected) {
+          surroundTextareaSelection("$$\n", "\n$$", options);
+        } else {
+          replaceTextareaSelection("$$\nE = mc^2\n$$", 3, 11, options);
+        }
+      }
     }
 
     return {

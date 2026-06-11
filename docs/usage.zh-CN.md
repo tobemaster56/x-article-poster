@@ -4,13 +4,7 @@
 
 ## 1. 安装 xPoster
 
-推荐安装方式：
-
-1. 打开 [xPoster Chrome Web Store 页面](https://chromewebstore.google.com/detail/xposter/iimkimodgdjnnmdopeolboakhjmhfbbj?authuser=0&hl=zh-CN)。
-2. 点击 **添加至 Chrome**。
-3. 使用应用商店版本，它会持续获得功能更新和体验完善。
-
-开发者源码安装：
+本项目不在 Chrome 应用商店上架，请自行加载源码：
 
 1. 下载或 clone xPoster。
 2. 打开 Chrome。
@@ -19,7 +13,7 @@
 5. 点击 **加载已解压的扩展程序**。
 6. 选择 xPoster 文件夹，也就是包含 `manifest.json` 的文件夹。
 
-普通用户建议走应用商店安装，不需要理解源码安装。
+也可以安装 [Tampermonkey](https://www.tampermonkey.net/) 后加载项目里的 `xposter.user.js`，使用精简的核心导入功能。
 
 ## 2. 准备 Markdown 草稿
 
@@ -123,7 +117,7 @@ xPoster 不会替你点击发布。你必须自己确认后，在 X 里手动发
 
 ### Chrome 说这是解包扩展
 
-源码安装时这是正常的。普通用户建议安装 Chrome 应用商店版本。
+源码安装时这是正常的。
 
 ### 检查文章时说找不到编辑器
 

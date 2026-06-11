@@ -18,7 +18,7 @@ This checks JavaScript syntax, the manifest, required extension files, icons, an
 - Do not add dependencies unless the feature clearly needs them.
 - Do not add analytics, tracking, payment gates, or license checks.
 - Keep the final X Publish action manual.
-- Update README or `docs/usage.md` when behavior changes.
+- Update README or `docs/usage.zh-CN.md` when behavior changes.
 
 ## Useful Manual Test
 

@@ -58,11 +58,8 @@ const requiredFiles = [
   "src/sidepanel-patterns.js",
   "fixtures/live-x-smoke.md",
   "README.md",
-  "docs/usage.md",
   "docs/usage.zh-CN.md",
-  "docs/privacy.md",
   "docs/privacy.zh-CN.md",
-  "docs/images/buy-me-a-coffee-qr.png",
   "assets/icon-16.png",
   "assets/icon-32.png",
   "assets/icon-48.png",
@@ -2128,14 +2125,6 @@ assert.ok(
   );
 }
 assert.ok(
-  sidepanelHtml.includes("https://github.com/nevertoday/xposter"),
-  "settings should link to the GitHub project page"
-);
-assert.ok(
-  sidepanelHtml.includes("https://x.com/xiaoxiaodong01"),
-  "settings should link to the author X profile"
-);
-assert.ok(
   includesAll(sidepanelHtml, [
     "vendor/minigfm.min.js",
     "src/sidepanel-config.js",
@@ -3271,9 +3260,7 @@ const readme = readText("README.md");
 const usageZh = readText("docs/usage.zh-CN.md");
 const allPublicText = [
   "README.md",
-  "docs/usage.md",
   "docs/usage.zh-CN.md",
-  "docs/privacy.md",
   "docs/privacy.zh-CN.md",
   "manifest.json",
   "sidepanel.js"
@@ -3282,15 +3269,12 @@ const allPublicText = [
   .join("\n");
 
 assert.ok(
-  readme.includes("https://chromewebstore.google.com/detail/xposter/iimkimodgdjnnmdopeolboakhjmhfbbj"),
-  "README should recommend the Chrome Web Store listing"
+  readme.includes("加载已解压的扩展程序") &&
+    readme.includes("xposter.user.js") &&
+    !readme.includes("chromewebstore.google.com"),
+  "README should document unpacked-extension + user script install, not the Chrome Web Store"
 );
-assert.ok(usageZh.includes("添加至 Chrome"), "Chinese usage guide should explain store installation");
-assert.ok(readme.includes("https://x.com/xiaoxiaodong01"), "README should include author contact");
-assert.ok(
-  readme.includes("docs/images/buy-me-a-coffee-qr.png"),
-  "README should include the support QR code"
-);
+assert.ok(usageZh.includes("加载已解压的扩展程序"), "Chinese usage guide should explain source install");
 assert.ok(
   !/https:\/\/[^\s"']*cos\.ap-guangzhou\.myqcloud\.com/.test(allPublicText),
   "private image host must not be exposed"

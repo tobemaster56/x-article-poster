@@ -785,13 +785,54 @@
     }
   }
 
+  // 把 $$...$$ / $...$ 公式换成占位符,避免 MiniGFM 把它们当普通文本(在代码块保护之后,
+  // 代码块内的 $ 不受影响)。还原发生在 sanitize 之后,KaTeX 的 MathML 输出可信、不经 sanitize。
+  function protectLatexPreview(markdown = "") {
+    const formulas = [];
+    let out = markdown.replace(/\$\$([\s\S]+?)\$\$/g, (m, f) => {
+      if (!f.trim()) return m;
+      const i = formulas.length;
+      formulas.push({ formula: f.trim(), display: true });
+      return `\n\nXPOSTERLATEXTOKEN${i}END\n\n`;
+    });
+    out = out.replace(/\$(?!\s)((?:\\.|[^$\n\\])+?)(?<!\s)\$/g, (m, f) => {
+      if (!f.trim()) return m;
+      const i = formulas.length;
+      formulas.push({ formula: f.trim(), display: false });
+      return `XPOSTERLATEXTOKEN${i}END`;
+    });
+    return { protectedMarkdown: out, formulas };
+  }
+
+  function restoreLatexPreview(html = "", formulas = []) {
+    if (!formulas.length) return html;
+    const katex = window.katex;
+    return html.replace(/XPOSTERLATEXTOKEN(\d+)END/g, (match, idx) => {
+      const item = formulas[Number(idx)];
+      if (!item) return match;
+      if (!katex || typeof katex.renderToString !== "function") {
+        return `<code class="latex-fallback">${shared.escapeHtml(item.formula)}</code>`;
+      }
+      try {
+        return katex.renderToString(item.formula, {
+          displayMode: item.display,
+          output: "mathml",
+          throwOnError: false
+        });
+      } catch {
+        return `<code class="latex-fallback">${shared.escapeHtml(item.formula)}</code>`;
+      }
+    });
+  }
+
   function markdownPreviewHtml(markdown = "") {
     const safe = shared.escapeHtml;
     const renderer = miniGfm();
-    const { protectedMarkdown, codeBlocks } = protectReadPreviewCodeBlocks(markdown);
-    return renderer
-      ? sanitizePreviewHtml(restoreReadPreviewCodeBlocks(renderer.parse(protectedMarkdown), codeBlocks))
-      : `<pre class="draft-read-fallback">${safe(markdown)}</pre>`;
+    const { protectedMarkdown: codeProtected, codeBlocks } = protectReadPreviewCodeBlocks(markdown);
+    const { protectedMarkdown, formulas } = protectLatexPreview(codeProtected);
+    if (!renderer) return `<pre class="draft-read-fallback">${safe(markdown)}</pre>`;
+    const html = sanitizePreviewHtml(restoreReadPreviewCodeBlocks(renderer.parse(protectedMarkdown), codeBlocks));
+    return restoreLatexPreview(html, formulas);
   }
 
   function emptyMarkdownPreviewHtml() {
@@ -3114,7 +3155,7 @@
 
     parsed.segments.forEach((segment, segmentIndex) => {
       const op = previewPlan.operations[operationIndex];
-      if (segment.type === "divider" || segment.type === "code" || segment.type === "tweet" || segment.type === "image" || segment.type === "table") {
+      if (segment.type === "divider" || segment.type === "code" || segment.type === "tweet" || segment.type === "image" || segment.type === "table" || segment.type === "latex") {
         operationIndex += 1;
       }
       rows.push(ledgerRowForSegment(segment, segmentIndex + 1, op, {
@@ -3236,6 +3277,17 @@
         label: "Divider",
         detail: "Divider is placed in the article.",
         path: "Divider",
+        tone: state.bridgeReady ? "ok" : "warn"
+      };
+    }
+    if (segment.type === "latex") {
+      return {
+        index,
+        indexLabel: String(index),
+        kind: "latex",
+        label: "LaTeX formula",
+        detail: "LaTeX formula is placed as an atomic block.",
+        path: "LaTeX",
         tone: state.bridgeReady ? "ok" : "warn"
       };
     }
@@ -3518,10 +3570,10 @@
       notes.push({ tone: "ok", text: "No media uploads required." });
     }
 
-    if (counts.tweet || counts.code || counts.divider) {
+    if (counts.tweet || counts.code || counts.divider || counts.latex) {
       notes.push({
         tone: "ok",
-        text: `${(counts.tweet || 0) + (counts.code || 0) + (counts.divider || 0)} special content block(s) will be placed in X.`
+        text: `${(counts.tweet || 0) + (counts.code || 0) + (counts.divider || 0) + (counts.latex || 0)} special content block(s) will be placed in X.`
       });
     }
 
@@ -3618,6 +3670,7 @@
     if (segment.type === "tweet") return `Tweet ${segment.tweetId}`;
     if (segment.type === "code") return `${segment.language || "code"} · ${(segment.code || "").split("\n").length} lines`;
     if (segment.type === "divider") return "Horizontal divider";
+    if (segment.type === "latex") return segment.formula;
     return "";
   }
 
@@ -4280,7 +4333,7 @@
     const status = latestPageStatus || {};
     const main = latestDiagnostics?.main || {};
     const vault = status.vault || latestDiagnostics?.vault || {};
-    const specialBlocks = (counts.code || 0) + (counts.divider || 0) + (counts.tweet || 0) + (counts.table || 0);
+    const specialBlocks = (counts.code || 0) + (counts.divider || 0) + (counts.tweet || 0) + (counts.table || 0) + (counts.latex || 0);
     const images = counts.image || 0;
     const remoteImageList = Array.isArray(context.parsedDrafts)
       ? remoteHttpImageSegmentsForParsedDrafts(context.parsedDrafts)

@@ -342,7 +342,7 @@
     return findDraftStateNode();
   }
 
-  function replaceMarkerWithAtomic(contentState, marker, entityType, data, mutability, sampleBlock) {
+  function replaceMarkerWithAtomic(contentState, marker, entityType, data, mutability, sampleBlock, text) {
     const blockKey = findMarkerBlock(contentState, marker, { exactOnly: true });
     if (!blockKey) return { ok: false, error: `Marker not found: ${marker}`, contentState };
 
@@ -358,11 +358,14 @@
     const withEntity = contentState.createEntity(entityType, mutability || "IMMUTABLE", data || {});
     const entityKey = withEntity.getLastCreatedEntityKey();
     const character = sampleCharacter.set("entity", entityKey);
+    // 多数 atomic 块文本是单个空格(真实数据在 entity);LATEX 例外:公式放在 block 文本里。
+    const atomicText = text != null && String(text).length ? String(text) : " ";
+    const atomicCharacterList = CharacterList(Array.from({ length: atomicText.length }, () => character));
     const atomicBlock = blockTemplate.merge({
       key: blockKey,
       type: "atomic",
-      text: " ",
-      characterList: CharacterList([character]),
+      text: atomicText,
+      characterList: atomicCharacterList,
       depth: 0
     });
     const blockMap = withEntity.getBlockMap().set(blockKey, atomicBlock);
@@ -386,7 +389,8 @@
         item.op.entityType,
         item.op.data || {},
         item.op.mutability || "IMMUTABLE",
-        sampleBlock
+        sampleBlock,
+        item.op.text
       );
       if (result.ok) {
         contentState = result.contentState;

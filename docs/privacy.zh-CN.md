@@ -30,7 +30,3 @@ xPoster 设计为本地浏览器扩展。
 - `tabs`：找到并检查当前 X Article 标签页。
 - `https://x.com/*` 和 `https://twitter.com/*`：在 X/Twitter 页面上运行导入器。
 - 已发布版本中的可选图片网站权限：当 Markdown 引用网页图片时，在你允许后读取图片文件。
-
-## 联系作者
-
-可以通过作者 X 主页联系：[@xiaoxiaodong01](https://x.com/xiaoxiaodong01)。
